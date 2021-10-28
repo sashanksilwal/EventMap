@@ -1,12 +1,13 @@
 import "./App.css";
 import Home from "./containers/home.js";
-import { ThemeProvider, createTheme } from "@material-ui/core/styles";
+import Event from "./containers/event";
+import Footer from "./components/footer";
+import TopBar from "./components/topBar";
 
+import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { grey, green } from "@material-ui/core/colors";
 import "fontsource-roboto";
-import TopBar from "./components/topBar";
-import Event from "./containers/event";
 
 const theme = createTheme({
   palette: {
@@ -22,8 +23,8 @@ const EventWrapper = ({ match }) => {
   return (
     <>
       <TopBar />
-      <Event eventName="hello" />
-      {/* <Event eventInfo={match} /> */}
+      <Event id={match.params.id} />
+      <Footer />
     </>
   );
 };
@@ -32,13 +33,12 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <Switch>
+          <Route path="/events/:id" component={EventWrapper} />
           <Route path="/">
+            <TopBar />
             <Home />
+            <Footer />
           </Route>
-          <Route path="/?location=">
-            <Home />
-          </Route>
-          <Route path="/event/:id" component={EventWrapper} />
         </Switch>
       </Router>
     </ThemeProvider>

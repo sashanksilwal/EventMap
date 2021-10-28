@@ -1,0 +1,14 @@
+.multiline {
+  white-space: pre-wrap;
+}
+.covidCasesInfoParagraph {
+  color: red;
+  font-size: large;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  padding-left: 2%;
+  margin-bottom: 1%;
+}
+
+.covidCasesInfoParagraph h3 {
+  color: black;
+}

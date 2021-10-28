@@ -10,8 +10,8 @@ import DetailsIcon from "@mui/icons-material/Details";
 import IconButton from "@material-ui/core/IconButton";
 
 import Typography from "@material-ui/core/Typography";
-import TopBar from "../components/topBar";
 import { useLocation } from "react-router-dom";
+import "./home.css";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -22,9 +22,30 @@ function Home() {
   const urlCountry = query.get("country");
   let finalImage;
   const [location, setLocation] = useState("");
-  const [country, setCountry] = useState();
+  //   () => {
+  //   axios
+  //     .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
+  //     .then(function (response) {
+  //       console.log(response);
+  //       return response.data.country_code;
+  //     })
+  //     .catch((err) => "US");
+  // }
+
+  const [country, setCountry] = useState("");
+  //   () => {
+  //   axios
+  //     .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
+  //     .then(function (response) {
+  //       console.log(response);
+  //       return response.data.country;
+  //     })
+  //     .catch((err) => "United States");
+  // }
+
   const [events, setEvents] = useState([]);
   const [cases, setCases] = useState();
+  const [dailyCases, setDailyCases] = useState();
 
   useEffect(() => {
     setLocation(urlLocation);
@@ -35,8 +56,10 @@ function Home() {
     axios
       .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
       .then(function (response) {
+        // if (location === response.data.country_code) {
         setLocation(response.data.country_code);
         setCountry(response.data.country);
+        // }
       })
       .catch(function (error) {
         console.log(`Error on getting the address from API ${error}`);
@@ -50,10 +73,6 @@ function Home() {
       )
       .then(function (response) {
         setEvents(response.data._embedded.events);
-        console.log(
-          "Should be printed only once",
-          response.data._embedded.events[0]
-        );
       })
       .catch(function (error) {
         console.log(error);
@@ -65,6 +84,10 @@ function Home() {
       )
       .then(function (response) {
         setCases(response.data[response.data.length - 1].Cases);
+        setDailyCases(
+          response.data[response.data.length - 1].Cases -
+            response.data[response.data.length - 2].Cases
+        );
       })
       .catch(function (error) {
         console.log(error);
@@ -73,17 +96,23 @@ function Home() {
 
   return (
     <div>
-      <TopBar active={location} />
       <Typography variant="h2" align="center">
         Events
       </Typography>
+
+      <div className="covidCasesInfoParagraph">
+        <h3>{country}</h3>
+        Number of Covid Cases today: {dailyCases}
+        <br />
+        Total number of Covid Cases: {cases}
+      </div>
       <ImageList>
         {events.map((item, i) => {
           finalImage = item.images.find(
             (a) => a.width === 305 && a.ratio === "3_2"
           );
           return (
-            <ImageListItem key={item.img} cols={0.5}>
+            <ImageListItem key={item.id} cols={0.5}>
               <img src={finalImage.url} alt={item.name} loading="lazy" />
               <ImageListItemBar
                 title={item.name}
@@ -95,7 +124,7 @@ function Home() {
                     sx={{ color: "rgba(255, 255, 255, 0.54)" }}
                     aria-label={`info about ${item.name}`}
                   >
-                    <Link to={`/event/${item.name}`}>
+                    <Link to={`/events/${item.id}`}>
                       <DetailsIcon style={{ fill: "white" }} />
                     </Link>
                   </IconButton>
@@ -105,7 +134,6 @@ function Home() {
           );
         })}
       </ImageList>
-      Number of Covid Cases: {cases}
     </div>
   );
 }
