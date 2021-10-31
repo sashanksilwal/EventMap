@@ -21,28 +21,9 @@ function Home() {
   const urlLocation = query.get("location");
   const urlCountry = query.get("country");
   let finalImage;
+
   const [location, setLocation] = useState("");
-  //   () => {
-  //   axios
-  //     .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
-  //     .then(function (response) {
-  //       console.log(response);
-  //       return response.data.country_code;
-  //     })
-  //     .catch((err) => "US");
-  // }
-
   const [country, setCountry] = useState("");
-  //   () => {
-  //   axios
-  //     .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
-  //     .then(function (response) {
-  //       console.log(response);
-  //       return response.data.country;
-  //     })
-  //     .catch((err) => "United States");
-  // }
-
   const [events, setEvents] = useState([]);
   const [cases, setCases] = useState();
   const [dailyCases, setDailyCases] = useState();
@@ -56,10 +37,11 @@ function Home() {
     axios
       .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
       .then(function (response) {
-        // if (location === response.data.country_code) {
-        setLocation(response.data.country_code);
-        setCountry(response.data.country);
-        // }
+        if (location || country) {
+          console.log(response.data.country, response.data.country_code);
+          setLocation(response.data.country_code);
+          setCountry(response.data.country);
+        }
       })
       .catch(function (error) {
         console.log(`Error on getting the address from API ${error}`);
@@ -72,40 +54,53 @@ function Home() {
         `https://app.ticketmaster.com/discovery/v2/events.json?countryCode=${location}&apikey=${EVENT_API}`
       )
       .then(function (response) {
-        setEvents(response.data._embedded.events);
+        if (response.data._embedded) {
+          setEvents(response.data._embedded.events);
+        }
       })
       .catch(function (error) {
         console.log(error);
       });
+  }, [location]);
 
-    axios
-      .get(
-        `https://api.covid19api.com/total/country/${country}/status/confirmed`
-      )
-      .then(function (response) {
-        setCases(response.data[response.data.length - 1].Cases);
-        setDailyCases(
-          response.data[response.data.length - 1].Cases -
-            response.data[response.data.length - 2].Cases
-        );
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }, [country, location]);
-
-  return (
-    <div>
-      <Typography variant="h2" align="center">
-        Events
-      </Typography>
-
+  useEffect(() => {
+    if (country !== null) {
+      axios
+        .get(
+          `https://api.covid19api.com/total/country/${country}/status/confirmed`
+        )
+        .then(function (response) {
+          setCases(response.data[response.data.length - 1].Cases);
+          setDailyCases(
+            response.data[response.data.length - 1].Cases -
+              response.data[response.data.length - 2].Cases
+          );
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  }, [country]);
+  let button;
+  if (country) {
+    button = (
       <div className="covidCasesInfoParagraph">
         <h3>{country}</h3>
         Number of Covid Cases today: {dailyCases}
         <br />
         Total number of Covid Cases: {cases}
       </div>
+    );
+  } else {
+    button = <></>;
+  }
+
+  return (
+    <div>
+      <Typography variant="h2" align="center">
+        Events
+      </Typography>
+      {button}
       <ImageList>
         {events.map((item, i) => {
           finalImage = item.images.find(
@@ -114,22 +109,22 @@ function Home() {
           return (
             <ImageListItem key={item.id} cols={0.5}>
               <img src={finalImage.url} alt={item.name} loading="lazy" />
-              <ImageListItemBar
-                title={item.name}
-                subtitle={
-                  item.info ? item.info : "Details unavailable at the moment"
-                }
-                actionIcon={
-                  <IconButton
-                    sx={{ color: "rgba(255, 255, 255, 0.54)" }}
-                    aria-label={`info about ${item.name}`}
-                  >
-                    <Link to={`/events/${item.id}`}>
+              <Link to={`/events/${item.id}`}>
+                <ImageListItemBar
+                  title={item.name}
+                  subtitle={
+                    item.info ? item.info : "Details unavailable at the moment"
+                  }
+                  actionIcon={
+                    <IconButton
+                      sx={{ color: "rgba(255, 255, 255, 0.54)" }}
+                      aria-label={`info about ${item.name}`}
+                    >
                       <DetailsIcon style={{ fill: "white" }} />
-                    </Link>
-                  </IconButton>
-                }
-              />
+                    </IconButton>
+                  }
+                />{" "}
+              </Link>
             </ImageListItem>
           );
         })}

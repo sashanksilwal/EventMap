@@ -27,17 +27,9 @@ function Event(props) {
     );
   }, [apiData]);
 
-  // let finalImage =
-  //   apiData &&
-  //   apiData.images.find((a) => a.width === 1024 && a.ratio === "3_2");
-
-  // if (!apiData) {
-  //   return;
-  // }
   return (
     <div>
       <h1>{apiData && apiData.name}</h1>
-      {/* <img src={finalImage && finalImage.url} alt="poster" /> */}
       <p>
         Event Date:{" "}
         <b>{apiData && apiData.dates && apiData.dates.start.localDate}</b>
@@ -48,13 +40,12 @@ function Event(props) {
           {apiData && apiData.url}
         </a>
       </p>
-      {/* <h3>Seat Map</h3> */}
-      <div className="seatMap">
-        {/* <div>
-          <h3>Seat Map</h3>
-        </div> */}
 
+      <div className="seatMap">
         <div>
+          <h3>Seat Map</h3>
+        </div>
+        <span>
           <img
             className="seatMapImg"
             src={
@@ -63,7 +54,16 @@ function Event(props) {
             }
             alt="SeatMap"
           />
-        </div>
+        </span>
+        <p>
+          {apiData &&
+            apiData["_embedded"] &&
+            apiData["_embedded"].venues[0].name}
+          ,
+          {apiData &&
+            apiData["_embedded"] &&
+            apiData["_embedded"].venues[0].city.name}
+        </p>
       </div>
     </div>
   );
