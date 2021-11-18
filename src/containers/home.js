@@ -1,8 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { IP_API, EVENT_API } from "../API_KEY";
 import { Link } from "react-router-dom";
-
 import ImageList from "@material-ui/core/ImageList";
 import ImageListItem from "@material-ui/core/ImageListItem";
 import ImageListItemBar from "@material-ui/core/ImageListItemBar";
@@ -12,6 +10,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Typography from "@material-ui/core/Typography";
 import { useLocation } from "react-router-dom";
 import "./home.css";
+require("dotenv").config();
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -35,7 +34,9 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get(`https://ipgeolocation.abstractapi.com/v1/?api_key=${IP_API}`)
+      .get(
+        `https://ipgeolocation.abstractapi.com/v1/?api_key=${process.env.REACT_APP_IP_API}`
+      )
       .then(function (response) {
         if (location || country) {
           console.log(response.data.country, response.data.country_code);
@@ -51,7 +52,7 @@ function Home() {
   useEffect(() => {
     axios
       .get(
-        `https://app.ticketmaster.com/discovery/v2/events.json?countryCode=${location}&apikey=${EVENT_API}`
+        `https://app.ticketmaster.com/discovery/v2/events.json?countryCode=${location}&apikey=${process.env.REACT_APP_EVENT_API}`
       )
       .then(function (response) {
         if (response.data._embedded) {

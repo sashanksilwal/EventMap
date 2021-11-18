@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import "./event.css";
-import { EVENT_API } from "../API_KEY";
+require("dotenv").config();
 function Event(props) {
   const [apiData, setApiData] = useState();
-  const URL = `https://app.ticketmaster.com/discovery/v2/events/${props.id}.json?apikey=${EVENT_API}`;
+  const URL = `https://app.ticketmaster.com/discovery/v2/events/${props.id}.json?apikey=${process.env.REACT_APP_EVENT_API}`;
 
   useEffect(() => {
     axios
