@@ -10,7 +10,29 @@ handled front-end interface through *React* (implementing Routers, hooks) and *M
  - [Covid19Api](https://covid19api.com)
  - [ip location](https://ipgeolocation.io)
 
+### Code Snippet
+```javascript
+useEffect(() => {
+    axios
+      .get(URL)
+      .then((respnose) => {
+        setApiData(respnose.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [URL]);
 
+  let finalImage = useMemo(() => {
+    if (!apiData) {
+      return " ";
+    }
+    return (
+      apiData.images.find((a) => a.width === 1024 && a.ratio === "3_2") ||
+      apiData.images[0].url
+    );
+  }, [apiData]);
+```
 Existing API Endpoints
 
 ##### An API Of Events
